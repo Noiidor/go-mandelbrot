@@ -1,0 +1,53 @@
+run:
+  timeout: "1m"
+  issues-exit-code: 1
+  tests: false
+  modules-download-mode: mod
+
+issues:
+  exclude-dirs:
+    - "internal/gen"
+
+output: 
+  formats:
+    - format: colored-line-number
+      path: stdout
+
+  print-issued-lines: true
+  print-linter-name: true
+  show-stats: false
+  sort-results: true
+  sort-order:
+    - linter
+    - severity
+    - file
+
+linters:
+  fast: false
+  disable-all: true
+  enable:
+    - errcheck
+    - gosimple
+    - bidichk
+    - bodyclose
+    - contextcheck
+    - copyloopvar
+    - dupword
+    - errchkjson
+    - exhaustive
+    - fatcontext
+    - forcetypeassert
+    - gocheckcompilerdirectives
+    - goconst
+    - gosec
+    - inamedparam
+    - intrange
+    - ireturn
+    - loggercheck
+    - makezero
+    - mirror
+    - musttag
+    - nakedret
+    - nilerr
+    - noctx
+    - nonamedreturns
