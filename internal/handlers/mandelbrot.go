@@ -58,6 +58,6 @@ func errorResponse(w http.ResponseWriter, err error, code int, message string) {
 	err = json.NewEncoder(w).Encode(response)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Internal Server Error"))
+		_, _ = w.Write([]byte("Internal Server Error"))
 	}
 }
