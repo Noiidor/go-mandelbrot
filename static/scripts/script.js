@@ -23,15 +23,16 @@ ws.onopen = () => {
 
 ws.onmessage = (event) => {
     console.log("received message");
-    if (event.data instanceof ArrayBuffer) {
-        const blob = new Blob([event.data], {type: "image/png"});
-        const url = URL.createObjectURL(blob);
+    if (event.data instanceof Blob) {
+        // const blob = new Blob([event.data], {type: "image/png"});
+        const url = URL.createObjectURL(event.data);
         console.log("created url: " + url);
 
         const img = new Image();
 
         img.onload = function() {
             console.log("img loaded");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(img, 0, 0, 500, 500);
         }
 
