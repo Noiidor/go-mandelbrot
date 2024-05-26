@@ -6,5 +6,6 @@ import (
 )
 
 func HandleMandelbrot(mux *http.ServeMux) {
+	mux.HandleFunc("GET /", handlers.IndexHandler)
 	mux.HandleFunc("GET /v1/mandelbrot", handlers.GetMandelbrotImageHandler)
 }
