@@ -6,6 +6,8 @@ import (
 )
 
 func HandleMandelbrot(mux *http.ServeMux) {
-	mux.HandleFunc("GET /", handlers.IndexHandler)
+	//mux.HandleFunc("GET /", handlers.IndexHandler)
 	mux.HandleFunc("GET /v1/mandelbrot", handlers.GetMandelbrotImageHandler)
+	mux.Handle("GET /", http.FileServer(http.Dir("./static/pages")))
+	mux.Handle("GET /static/scripts/", http.StripPrefix("/static/scripts/", http.FileServer(http.Dir("./static/scripts"))))
 }
