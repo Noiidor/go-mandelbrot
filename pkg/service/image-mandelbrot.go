@@ -6,6 +6,7 @@ import (
 	"image/color"
 	"image/draw"
 	"math/cmplx"
+	"sync"
 	"time"
 )
 
@@ -48,12 +49,21 @@ func generateItersMap2(pointX, pointY float64, zoom uint64, maxIters uint32, wid
 	}
 
 	result := make([][]uint32, width)
-	for y := range result {
-		result[y] = make([]uint32, height)
-		for x := range result[y] {
-			result[y][x] = iteratePoint(axisX[x], axisY[y], maxIters)
+
+	var wg sync.WaitGroup
+
+	for x := range result {
+		result[x] = make([]uint32, height)
+		for y := range result[x] {
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				result[x][y] = iteratePoint(axisX[y], axisY[x], maxIters)
+			}()
 		}
 	}
+
+	wg.Wait()
 
 	return result
 }
