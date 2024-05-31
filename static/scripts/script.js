@@ -1,3 +1,5 @@
+// I dont know JS
+
 const ws = new WebSocket("ws://localhost:5050/v1/mandelbrot")
 
 ws.binaryType = "arrayBuffer"
@@ -5,14 +7,26 @@ ws.binaryType = "arrayBuffer"
 const canvas = document.getElementById("mandelbrotCanvas");
 const ctx = canvas.getContext("2d");
 
+const zoomSlider = document.getElementById("sliderZoom");
+const zoomInput = document.getElementById("inputZoom");
+
+zoomSlider.addEventListener("input", (event) => {
+    zoomInput.value = event.target.value;
+})
+
+zoomInput.addEventListener("input", (event) => {
+    zoomSlider.value = event.target.value;
+})
+
 ws.onopen = () => {
     console.log("connected to websocket");
 
     document.getElementById("requestImage").addEventListener("click", () => {
         const message = {
-            pointX: 0,
-            pointY: 0,
-            zoom: 10,
+            pointX: parseFloat(document.getElementById("inputX").value),
+            pointY: parseFloat(document.getElementById("inputY").value),
+            zoom: parseInt(document.getElementById("inputZoom").value),
+            maxIters: parseInt(document.getElementById("inputIters").value),
             resolutionWidth: 500,
             resolutionHeight: 500
         };

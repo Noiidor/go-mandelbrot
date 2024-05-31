@@ -1,7 +1,75 @@
-body {
-    background-color: cadetblue;
+/* Reset some default styles for better cross-browser consistency */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-#canvas {
-    border: 1px solid black;
+body {
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+h2 {
+    margin-bottom: 20px;
+    font-size: 2rem;
+    color: #2c3e50;
+}
+
+canvas {
+    border: 1px solid #2c3e50;
+    margin-bottom: 20px;
+}
+
+p {
+    margin-top: 10px;
+    font-size: 1rem;
+    color: #34495e;
+}
+
+.inputs {
+    margin-top: 5px;
+    margin-bottom: 20px;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #bdc3c7;
+    border-radius: 5px;
+    width: calc(100% - 24px); /* Adjust width to account for padding and border */
+}
+
+#sliderZoom {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: #fff;
+    background-color: #3498db;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+    body {
+        padding: 20px;
+    }
+
+    .inputs {
+        width: 300px; /* Fixed width for larger screens */
+    }
 }
