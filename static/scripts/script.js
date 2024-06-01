@@ -24,8 +24,8 @@ zoomInput.addEventListener("input", (event) => {
 canvas.addEventListener("click", function(e) {
     const rect = canvas.getBoundingClientRect();
     // 0,0 = bottom left corner
-    const px = event.clientX - rect.left;
-    const py = rect.bottom - event.clientY;
+    const px = e.clientX - rect.left;
+    const py = rect.bottom - e.clientY;
 
     zoomInput.value *= 2
 

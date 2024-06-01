@@ -25,13 +25,15 @@ const (
 	defaultRegionsNum = 50
 )
 
+var blackRGBA = color.RGBA{R: 255, G: 255, B: 255, A: 255}
+
 type colorRegion struct {
 	// endIter  uint32
 	nextRegion *colorRegion
 	startColor color.RGBA
 }
 
-var savedRegions = generateRegions(defaultRegionsNum)
+var savedRegions = GenerateRegions(defaultRegionsNum)
 
 func GenerateMandelbrotImage(pointX, pointY float64, zoom uint64, maxIters uint32, width, height uint32) image.Image {
 	pixelItersMap := generateItersMap(pointX, pointY, zoom, maxIters, width, height)
@@ -94,7 +96,7 @@ func generateItersMap(pointX, pointY float64, zoom uint64, maxIters uint32, widt
 	return result
 }
 
-func generateRegions(numOfRegions uint32) map[uint32]*colorRegion {
+func GenerateRegions(numOfRegions uint32) map[uint32]*colorRegion {
 	regions := make(map[uint32]*colorRegion, numOfRegions)
 
 	var prevRegion *colorRegion
@@ -118,10 +120,13 @@ func generateImage(itersMap [][]uint32, width, height uint32) image.Image {
 	for x, xRow := range itersMap {
 		for y, iter := range xRow {
 			boundedIter := iter - (iter % itersPerRegion)
-			region := savedRegions[boundedIter]
+			region, ok := savedRegions[boundedIter]
+			if !ok {
+				region = &colorRegion{startColor: blackRGBA}
+			}
 
 			leftColor := region.startColor
-			rightColor := color.RGBA{}
+			rightColor := blackRGBA
 			if region.nextRegion != nil {
 				rightColor = region.nextRegion.startColor
 			}
