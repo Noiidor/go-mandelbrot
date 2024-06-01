@@ -1,6 +1,8 @@
 // I dont know JS
 
+// Remove hard-coded url
 const ws = new WebSocket("ws://localhost:5050/v1/mandelbrot")
+const colorsUrl = "http://localhost:5050/v1/mandelbrot/colors"
 
 ws.binaryType = "arrayBuffer"
 
@@ -38,9 +40,6 @@ canvas.addEventListener("click", function(e) {
     sendGenerateRequest();
 })
 
-function getClickPosition(canvas, event) {
-}
-
 function transformPixelToCartesian(point, pixelBounds, axisMin, axisMax, zoom, offset) {
     axisMin = (axisMin / zoom) + offset;
     axisMax = (axisMax / zoom) + offset;
@@ -58,6 +57,17 @@ ws.onopen = () => {
     document.getElementById("requestImage").addEventListener("click", function() {
         sendGenerateRequest();
     });
+
+    document.getElementById("requestColors").addEventListener("click", function() {
+        const res = fetch(colorsUrl, {
+            method: "PUT",
+        });
+
+        if (!res.ok) {
+            console.log("Colors not OK: " + res.status);
+        }
+        sendGenerateRequest();
+    })
 };
 
 function sendGenerateRequest() {

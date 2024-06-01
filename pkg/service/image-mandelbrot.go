@@ -33,7 +33,7 @@ type colorRegion struct {
 	startColor color.RGBA
 }
 
-var savedRegions = GenerateRegions(defaultRegionsNum)
+var savedRegions = generateRegions(defaultRegionsNum)
 
 func GenerateMandelbrotImage(pointX, pointY float64, zoom uint64, maxIters uint32, width, height uint32) image.Image {
 	pixelItersMap := generateItersMap(pointX, pointY, zoom, maxIters, width, height)
@@ -96,7 +96,7 @@ func generateItersMap(pointX, pointY float64, zoom uint64, maxIters uint32, widt
 	return result
 }
 
-func GenerateRegions(numOfRegions uint32) map[uint32]*colorRegion {
+func generateRegions(numOfRegions uint32) map[uint32]*colorRegion {
 	regions := make(map[uint32]*colorRegion, numOfRegions)
 
 	var prevRegion *colorRegion
@@ -110,6 +110,12 @@ func GenerateRegions(numOfRegions uint32) map[uint32]*colorRegion {
 		prevRegion = region
 	}
 	return regions
+}
+
+func RegenerateRegions() {
+	for _, v := range savedRegions {
+		v.startColor = colorhelp.RandomRGBAColor()
+	}
 }
 
 func generateImage(itersMap [][]uint32, width, height uint32) image.Image {
