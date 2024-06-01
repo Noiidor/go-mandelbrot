@@ -26,7 +26,8 @@ canvas.addEventListener("click", function(e) {
     // 0,0 = bottom left corner
     const px = event.clientX - rect.left;
     const py = rect.bottom - event.clientY;
-    console.log("X: "+px + " Y: "+py);
+
+    zoomInput.value *= 2
 
     const x = transformPixelToCartesian(px, 500, -2, 2, parseInt(zoomInput.value), parseFloat(xInput.value));
     const y = transformPixelToCartesian(py, 500, -2, 2, parseInt(zoomInput.value), parseFloat(yInput.value));
