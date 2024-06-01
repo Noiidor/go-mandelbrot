@@ -71,7 +71,7 @@ func generateItersMap(pointX, pointY float64, zoom uint64, maxIters uint32, widt
 	}
 
 	for i := range height {
-		axisY[i] = transformPixelToCartesian(i, height, -2, 2, pointY, zoom)
+		axisY[i] = transformPixelToCartesian(i, height, -2, 2, -pointY, zoom)
 	}
 
 	result := make([][]uint32, width)
