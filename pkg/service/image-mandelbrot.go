@@ -2,11 +2,12 @@ package service
 
 import (
 	"fmt"
+	colorhelp "go-mandelbrot/pkg/helpers/color"
+	"go-mandelbrot/pkg/helpers/math"
 	"image"
 	"image/color"
 	"image/draw"
 	"math/cmplx"
-	"math/rand/v2"
 	"sync"
 	"time"
 )
@@ -33,11 +34,11 @@ type colorRegion struct {
 var savedRegions = generateRegions(defaultRegionsNum)
 
 func GenerateMandelbrotImage(pointX, pointY float64, zoom uint64, maxIters uint32, width, height uint32) image.Image {
-	pixelItersMap := generateItersMap2(pointX, pointY, zoom, maxIters, width, height)
+	pixelItersMap := generateItersMap(pointX, pointY, zoom, maxIters, width, height)
 
 	checkRegionsDeficiency(maxIters)
 
-	img := generateImage(pixelItersMap, width, height, maxIters)
+	img := generateImage(pixelItersMap, width, height)
 
 	return img
 }
@@ -59,7 +60,7 @@ func transformPixelToCartesian(point, pixelBounds uint32, axisMin, axisMax, offs
 	return transformed + offset
 }
 
-func generateItersMap2(pointX, pointY float64, zoom uint64, maxIters uint32, width, height uint32) [][]uint32 {
+func generateItersMap(pointX, pointY float64, zoom uint64, maxIters uint32, width, height uint32) [][]uint32 {
 	defer timer("generate iters map")()
 
 	axisX := make([]float64, width)
@@ -95,26 +96,18 @@ func generateItersMap2(pointX, pointY float64, zoom uint64, maxIters uint32, wid
 
 func generateRegions(numOfRegions uint32) map[uint32]*colorRegion {
 	regions := make(map[uint32]*colorRegion, numOfRegions)
+
 	var prevRegion *colorRegion
 	for i := range numOfRegions + 1 {
-		regionIter := uint32((numOfRegions * itersPerRegion) - (itersPerRegion * i))
 		region := &colorRegion{
 			nextRegion: prevRegion,
-			startColor: randomRGBAColor(),
+			startColor: colorhelp.RandomRGBAColor(),
 		}
+		regionIter := uint32((numOfRegions * itersPerRegion) - (itersPerRegion * i))
 		regions[regionIter] = region
 		prevRegion = region
 	}
 	return regions
-}
-
-func randomRGBAColor() color.RGBA {
-	min := 50
-	max := 255
-	return color.RGBA{
-		uint8(rand.IntN(max-min) + min),
-		uint8(rand.IntN(max-min) + min),
-		uint8(rand.IntN(max-min) + min), 255}
 }
 
 func generateImage(itersMap [][]uint32, width, height uint32) image.Image {
@@ -123,23 +116,18 @@ func generateImage(itersMap [][]uint32, width, height uint32) image.Image {
 	draw.Draw(img, img.Bounds(), &image.Uniform{color.White}, image.Point{0, 0}, draw.Src)
 
 	for x, xRow := range itersMap {
-		for y := range xRow {
-			iter := itersMap[x][y]
-			boundedIter := iter
-			iMod := iter % itersPerRegion
-			if iMod > 0 {
-				boundedIter = iter - iMod
-			}
+		for y, iter := range xRow {
+			boundedIter := iter - (iter % itersPerRegion)
 			region := savedRegions[boundedIter]
+
 			leftColor := region.startColor
 			rightColor := color.RGBA{}
 			if region.nextRegion != nil {
 				rightColor = region.nextRegion.startColor
 			}
 
-			ratio := ratioBetweenNums(int(boundedIter), int(boundedIter+itersPerRegion), int(iter))
-
-			color := lerpColor(leftColor, rightColor, ratio)
+			ratio := math.RatioBetweenNums(int(boundedIter), int(boundedIter+itersPerRegion), int(iter))
+			color := colorhelp.LerpColor(leftColor, rightColor, ratio)
 
 			img.Set(y, x, color)
 		}
@@ -159,31 +147,6 @@ func iteratePoint(x, y float64, maxIters uint32) uint32 {
 			return n
 		}
 	}
+
 	return maxIters
-}
-
-func lerp(a, b, t float64) float64 {
-	return (a * (1.0 - t)) + (b * t)
-}
-
-func lerpColor(a, b color.RGBA, t float64) color.Color {
-	if t == 0 {
-		return a
-	}
-	if t == 1.0 {
-		return b
-	}
-
-	// Damn
-	resultColor := color.RGBA{
-		uint8(lerp(float64(a.R), float64(b.R), t)),
-		uint8(lerp(float64(a.G), float64(b.G), t)),
-		uint8(lerp(float64(a.B), float64(b.B), t)),
-		uint8(lerp(float64(a.A), float64(b.A), t))}
-
-	return resultColor
-}
-
-func ratioBetweenNums(a, b, x int) float64 {
-	return 1.0 - (float64(b)-float64(x))/(float64(b)-float64(a))
 }
