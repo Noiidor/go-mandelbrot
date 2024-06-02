@@ -23,13 +23,19 @@ zoomInput.addEventListener("input", (event) => {
     zoomSlider.value = event.target.value;
 })
 
-canvas.addEventListener("click", function(e) {
+canvas.addEventListener("wheel", function(e) {
     const rect = canvas.getBoundingClientRect();
     // 0,0 = bottom left corner
     const px = e.clientX - rect.left;
     const py = rect.bottom - e.clientY;
 
-    zoomInput.value *= 2
+    var dir = Math.sign(e.deltaY);
+
+    if (dir > 0) {
+        zoomInput.value /= 2
+    } else{
+        zoomInput.value *= 2
+    }
 
     const x = transformPixelToCartesian(px, 500, -2, 2, parseInt(zoomInput.value), parseFloat(xInput.value));
     const y = transformPixelToCartesian(py, 500, -2, 2, parseInt(zoomInput.value), parseFloat(yInput.value));
@@ -56,6 +62,10 @@ ws.onopen = () => {
 
     document.getElementById("requestImage").addEventListener("click", function() {
         sendGenerateRequest();
+
+        zoomSlider.max = zoomInput.value;
+        zoomSlider.step = zoomInput.value/10
+        zoomSlider.value = zoomInput.value
     });
 
     document.getElementById("requestColors").addEventListener("click", function() {

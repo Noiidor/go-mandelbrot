@@ -7,19 +7,22 @@
     <link rel="stylesheet" type="text/css" href="index.css">
 </head>
 <body>
-    <h2>Mandelbrot</h2>
-    <canvas id="mandelbrotCanvas" width="500" height="500"></canvas>
-    <p>CenterX</p>
-    <input type="number" step="0.01" value="0" name="center_x" class="inputs" id="inputX">
-    <p>CenterY</p>
-    <input type="number" step="0.01" value="0" name="center_y" class="inputs" id="inputY">
-    <p>MaxIters</p>
-    <input type="number" name="max_iters" value="500" class="inputs" id="inputIters">
-    <p>Zoom</p>
-    <input type="range" min="1" max="100000" value="1" name="zoom" class="inputs" id="sliderZoom">
-    <input type="number" value="1" id="inputZoom">
-    <button id="requestImage">Generate</button>
-    <button id="requestColors">Randomize colors</button>
+    <div class="container">
+        <div class="controls">
+            <p>CenterX</p>
+            <input type="number" step="0.01" value="0" name="center_x" class="inputs no-arrows" id="inputX">
+            <p>CenterY</p>
+            <input type="number" step="0.01" value="0" name="center_y" class="inputs no-arrows" id="inputY">
+            <p>MaxIters</p>
+            <input type="number" name="max_iters" value="500" class="inputs no-arrows" id="inputIters">
+            <p>Zoom</p>
+            <input type="range" min="1" max="100000" value="1" name="zoom" class="inputs" id="sliderZoom">
+            <input type="number" value="1" id="inputZoom" class="inputs no-arrows">
+            <button id="requestImage">Generate</button>
+            <button id="requestColors">Randomize colors</button>
+        </div>
+        <canvas id="mandelbrotCanvas" width="500" height="500"></canvas>
+    </div>
     <script type="text/javascript" src="/static/scripts/script.js"></script>
 </body>
 </html>

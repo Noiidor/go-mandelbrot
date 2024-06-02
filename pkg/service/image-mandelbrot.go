@@ -22,10 +22,10 @@ func timer(name string) func() {
 const (
 	itersPerRegion = 10
 
-	defaultRegionsNum = 50
+	defaultRegionsNum = 100
 )
 
-var blackRGBA = color.RGBA{R: 255, G: 255, B: 255, A: 255}
+var blackRGBA = color.RGBA{R: 0, G: 0, B: 0, A: 0}
 
 type colorRegion struct {
 	// endIter  uint32

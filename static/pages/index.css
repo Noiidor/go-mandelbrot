@@ -1,75 +1,107 @@
-/* Reset some default styles for better cross-browser consistency */
-* {
+/* General styling */
+body {
+    background-color: #121212;
+    color: #FFFFFF;
+    font-family: 'Roboto', sans-serif;
     margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
-body {
-    font-family: 'Arial', sans-serif;
+.container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.controls {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    background-color: #f0f0f0;
-    color: #333;
+    margin-right: 20px;
 }
 
 h2 {
-    margin-bottom: 20px;
+    margin: 20px 0;
     font-size: 2rem;
-    color: #2c3e50;
+    color: #BB86FC;
 }
 
-canvas {
-    border: 1px solid #2c3e50;
-    margin-bottom: 20px;
+/* Canvas styling */
+#mandelbrotCanvas {
+    border: 1px solid #BB86FC;
 }
 
+/* Paragraphs and inputs styling */
 p {
-    margin-top: 10px;
-    font-size: 1rem;
-    color: #34495e;
+    margin: 5px 0;
 }
 
 .inputs {
-    margin-top: 5px;
-    margin-bottom: 20px;
-    padding: 10px;
-    font-size: 1rem;
-    border: 1px solid #bdc3c7;
-    border-radius: 5px;
-    width: calc(100% - 24px); /* Adjust width to account for padding and border */
+    background-color: #1F1F1F;
+    border: 1px solid #333;
+    color: #FFF;
+    border-radius: 4px;
+    padding: 5px;
+    margin-bottom: 10px;
 }
 
-#sliderZoom {
+.no-arrows {
+    -moz-appearance: textfield;
+}
+
+.no-arrows::-webkit-outer-spin-button,
+.no-arrows::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    width: 100px;
+}
+
+input[type="range"] {
     width: 100%;
-    margin-bottom: 20px;
 }
 
+/* Button styling */
 button {
-    padding: 10px 20px;
-    font-size: 1rem;
-    color: #fff;
-    background-color: #3498db;
+    background-color: #BB86FC;
     border: none;
-    border-radius: 5px;
+    color: #121212;
+    padding: 10px 20px;
+    margin: 10px 0;
+    border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
 
 button:hover {
-    background-color: #2980b9;
+    background-color: #3700B3;
 }
 
-/* Responsive adjustments */
-@media (min-width: 768px) {
-    body {
-        padding: 20px;
+/* Responsive styling */
+@media (max-width: 600px) {
+    .container {
+        flex-direction: column;
+        align-items: center;
     }
 
-    .inputs {
-        width: 300px; /* Fixed width for larger screens */
+    #mandelbrotCanvas {
+        width: 100%;
+        height: auto;
+    }
+
+    input[type="number"] {
+        width: 80%;
+    }
+
+    input[type="range"] {
+        width: 80%;
+    }
+
+    button {
+        width: 80%;
     }
 }
