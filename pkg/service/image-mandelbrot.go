@@ -20,12 +20,12 @@ func timer(name string) func() {
 }
 
 const (
-	itersPerRegion = 10
+	itersPerRegion = 20
 
 	defaultRegionsNum = 100
 )
 
-var blackRGBA = color.RGBA{R: 0, G: 0, B: 0, A: 0}
+var blackRGBA = color.RGBA{R: 0, G: 0, B: 0, A: 255}
 
 type colorRegion struct {
 	// endIter  uint32
@@ -40,7 +40,7 @@ func GenerateMandelbrotImage(pointX, pointY float64, zoom uint64, maxIters uint3
 
 	checkRegionsDeficiency(maxIters)
 
-	img := generateImage(pixelItersMap, width, height)
+	img := generateImage(pixelItersMap, width, height, maxIters)
 
 	return img
 }
@@ -100,11 +100,13 @@ func generateRegions(numOfRegions uint32) map[uint32]*colorRegion {
 	regions := make(map[uint32]*colorRegion, numOfRegions)
 
 	var prevRegion *colorRegion
+	prevColor := colorhelp.RandomRGBAColor()
 	for i := range numOfRegions + 1 {
 		region := &colorRegion{
 			nextRegion: prevRegion,
-			startColor: colorhelp.RandomRGBAColor(),
+			// startColor: colorhelp.RandomRGBAColor(),
 		}
+		region.startColor = colorhelp.ShuffleColor(colorhelp.InvertColor(prevColor))
 		regionIter := uint32((numOfRegions * itersPerRegion) - (itersPerRegion * i))
 		regions[regionIter] = region
 		prevRegion = region
@@ -118,13 +120,17 @@ func RegenerateRegions() {
 	}
 }
 
-func generateImage(itersMap [][]uint32, width, height uint32) image.Image {
+func generateImage(itersMap [][]uint32, width, height, maxIter uint32) image.Image {
 	defer timer("generate image")()
 	img := image.NewRGBA(image.Rect(0, 0, int(width), int(height)))
 	draw.Draw(img, img.Bounds(), &image.Uniform{color.White}, image.Point{0, 0}, draw.Src)
 
 	for x, xRow := range itersMap {
 		for y, iter := range xRow {
+			if iter == maxIter {
+				img.Set(y, x, blackRGBA)
+				continue
+			}
 			boundedIter := iter - (iter % itersPerRegion)
 			region, ok := savedRegions[boundedIter]
 			if !ok {

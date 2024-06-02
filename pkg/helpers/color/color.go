@@ -32,3 +32,22 @@ func LerpColor(a, b color.RGBA, t float64) color.Color {
 
 	return resultColor
 }
+
+func InvertColor(c color.RGBA) color.RGBA {
+	return color.RGBA{
+		R: 255 - c.R,
+		G: 255 - c.G,
+		B: 255 - c.B,
+		A: c.A,
+	}
+}
+
+// Slighly randomizes given color
+func ShuffleColor(c color.RGBA) color.RGBA {
+	return color.RGBA{ // bruh
+		R: uint8(math.ClampInt(int(c.R)+math.RandomRange(-10, 10), 0, 255)),
+		G: uint8(math.ClampInt(int(c.G)+math.RandomRange(-10, 10), 0, 255)),
+		B: uint8(math.ClampInt(int(c.B)+math.RandomRange(-10, 10), 0, 255)),
+		A: c.A,
+	}
+}
