@@ -24,6 +24,10 @@ zoomInput.addEventListener("input", event => {
     zoomSlider.value = event.target.value;
 });
 
+function clamp(num, min, max) {
+    return Math.min(Math.max(num, min), max);
+}
+
 // Handle canvas zoom with wheel
 canvas.addEventListener("wheel", event => {
     const rect = canvas.getBoundingClientRect();
@@ -31,7 +35,7 @@ canvas.addEventListener("wheel", event => {
     const py = rect.bottom - event.clientY;
     const direction = Math.sign(event.deltaY);
 
-    zoomInput.value = direction > 0 ? zoomInput.value / 2 : zoomInput.value * 2;
+    zoomInput.value = clamp((direction > 0 ? zoomInput.value / 2 : zoomInput.value * 2), 1, Number.POSITIVE_INFINITY);
 
     const x = transformPixelToCartesian(px, 500, -2, 2, parseInt(zoomInput.value), parseFloat(xInput.value));
     const y = transformPixelToCartesian(py, 500, -2, 2, parseInt(zoomInput.value), parseFloat(yInput.value));
