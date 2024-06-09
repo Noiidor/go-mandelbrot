@@ -16,6 +16,11 @@ const xInput = document.getElementById("inputX");
 const yInput = document.getElementById("inputY");
 const iterInput = document.getElementById("inputIters");
 
+const leftButton = document.getElementById("leftButton");
+const rightButton = document.getElementById("rightButton");
+const downButton = document.getElementById("downButton");
+const upButton = document.getElementById("upButton");
+
 zoomSlider.addEventListener("input", event => {
     zoomInput.value = event.target.value;
 });
@@ -45,6 +50,35 @@ canvas.addEventListener("wheel", event => {
 
     sendGenerateRequest();
 });
+
+// TODO: change hardcoded params to variable
+leftButton.addEventListener("click", () => {
+    const x = transformPixelToCartesian(0, 500, -2, 2, parseInt(zoomInput.value), parseFloat(xInput.value));
+    xInput.value = x;
+
+    sendGenerateRequest();
+})
+
+rightButton.addEventListener("click", () => {
+    const x = transformPixelToCartesian(500, 500, -2, 2, parseInt(zoomInput.value), parseFloat(xInput.value));
+    xInput.value = x;
+
+    sendGenerateRequest();
+})
+
+upButton.addEventListener("click", () => {
+    const y = transformPixelToCartesian(500, 500, -2, 2, parseInt(zoomInput.value), parseFloat(yInput.value));
+    yInput.value = y;
+
+    sendGenerateRequest();
+})
+
+downButton.addEventListener("click", () => {
+    const y = transformPixelToCartesian(0, 500, -2, 2, parseInt(zoomInput.value), parseFloat(yInput.value));
+    yInput.value = y;
+
+    sendGenerateRequest();
+})
 
 function transformPixelToCartesian(point, pixelBounds, axisMin, axisMax, zoom, offset) {
     const adjustedAxisMin = (axisMin / zoom) + offset;

@@ -12,7 +12,7 @@ func main() {
 	route.HandleMandelbrot(mux)
 
 	server := http.Server{
-		Addr:              "localhost:5050",
+		Addr:              "localhost:5050", //TODO: change to config or flag
 		Handler:           mux,
 		ReadHeaderTimeout: 3 * time.Second,
 	}

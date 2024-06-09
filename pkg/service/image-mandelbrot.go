@@ -25,14 +25,13 @@ const (
 	defaultRegionsNum = 100
 )
 
-var blackRGBA = color.RGBA{R: 0, G: 0, B: 0, A: 255}
-
 type colorRegion struct {
-	// endIter  uint32
 	nextRegion *colorRegion
 	startColor color.RGBA
 }
 
+// Note: all "state" is client-side, except color palette
+// Better to change this
 var savedRegions = generateRegions(defaultRegionsNum)
 
 func GenerateMandelbrotImage(pointX, pointY float64, zoom uint64, maxIters uint32, width, height uint32) image.Image {
@@ -96,6 +95,7 @@ func generateItersMap(pointX, pointY float64, zoom uint64, maxIters uint32, widt
 	return result
 }
 
+// TODO: make better and more consistent coloring(probably histogram)
 func generateRegions(numOfRegions uint32) map[uint32]*colorRegion {
 	regions := make(map[uint32]*colorRegion, numOfRegions)
 
@@ -128,17 +128,17 @@ func generateImage(itersMap [][]uint32, width, height, maxIter uint32) image.Ima
 	for x, xRow := range itersMap {
 		for y, iter := range xRow {
 			if iter == maxIter {
-				img.Set(y, x, blackRGBA)
+				img.Set(y, x, colorhelp.BlackRGBA)
 				continue
 			}
 			boundedIter := iter - (iter % itersPerRegion)
 			region, ok := savedRegions[boundedIter]
 			if !ok {
-				region = &colorRegion{startColor: blackRGBA}
+				region = &colorRegion{startColor: colorhelp.BlackRGBA}
 			}
 
 			leftColor := region.startColor
-			rightColor := blackRGBA
+			rightColor := colorhelp.BlackRGBA
 			if region.nextRegion != nil {
 				rightColor = region.nextRegion.startColor
 			}

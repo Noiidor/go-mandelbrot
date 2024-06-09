@@ -6,6 +6,8 @@ import (
 	"math/rand/v2"
 )
 
+var BlackRGBA = color.RGBA{R: 0, G: 0, B: 0, A: 255}
+
 func RandomRGBAColor() color.RGBA {
 	min := 50
 	max := 255

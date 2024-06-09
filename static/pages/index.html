@@ -21,8 +21,17 @@
             <button id="requestImage">Generate</button>
             <button id="requestColors">Randomize colors</button>
         </div>
-        <canvas id="mandelbrotCanvas" width="500" height="500"></canvas>
+        <div class="canvas-container">
+            <button class="direction-button" id="upButton">&#9650;</button>
+            <div class="middle-row">
+                <button class="direction-button" id="leftButton">&#9664;</button>
+                <canvas id="mandelbrotCanvas" width="500" height="500"></canvas>
+                <button class="direction-button" id="rightButton">&#9654;</button>
+            </div>
+            <button class="direction-button" id="downButton">&#9660;</button>
+        </div>
     </div>
     <script type="text/javascript" src="/static/scripts/script.js"></script>
 </body>
 </html>
+
