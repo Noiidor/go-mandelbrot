@@ -42,8 +42,8 @@ canvas.addEventListener("wheel", event => {
 
     zoomInput.value = clamp((direction > 0 ? zoomInput.value / 2 : zoomInput.value * 2), 1, Number.POSITIVE_INFINITY);
 
-    const x = transformPixelToCartesian(px, 500, -2, 2, parseInt(zoomInput.value), parseFloat(xInput.value));
-    const y = transformPixelToCartesian(py, 500, -2, 2, parseInt(zoomInput.value), parseFloat(yInput.value));
+    const x = transformPixelToCartesian(px, parseInt(canvas.width), -2, 2, parseInt(zoomInput.value), parseFloat(xInput.value));
+    const y = transformPixelToCartesian(py, parseInt(canvas.height), -2, 2, parseInt(zoomInput.value), parseFloat(yInput.value));
 
     xInput.value = x;
     yInput.value = y;
@@ -53,28 +53,28 @@ canvas.addEventListener("wheel", event => {
 
 // TODO: change hardcoded params to variable
 leftButton.addEventListener("click", () => {
-    const x = transformPixelToCartesian(0, 500, -2, 2, parseInt(zoomInput.value), parseFloat(xInput.value));
+    const x = transformPixelToCartesian(0, parseInt(canvas.width), -2, 2, parseInt(zoomInput.value), parseFloat(xInput.value));
     xInput.value = x;
 
     sendGenerateRequest();
 })
 
 rightButton.addEventListener("click", () => {
-    const x = transformPixelToCartesian(500, 500, -2, 2, parseInt(zoomInput.value), parseFloat(xInput.value));
+    const x = transformPixelToCartesian(500, parseInt(canvas.width), -2, 2, parseInt(zoomInput.value), parseFloat(xInput.value));
     xInput.value = x;
 
     sendGenerateRequest();
 })
 
 upButton.addEventListener("click", () => {
-    const y = transformPixelToCartesian(500, 500, -2, 2, parseInt(zoomInput.value), parseFloat(yInput.value));
+    const y = transformPixelToCartesian(500, parseInt(canvas.height), -2, 2, parseInt(zoomInput.value), parseFloat(yInput.value));
     yInput.value = y;
 
     sendGenerateRequest();
 })
 
 downButton.addEventListener("click", () => {
-    const y = transformPixelToCartesian(0, 500, -2, 2, parseInt(zoomInput.value), parseFloat(yInput.value));
+    const y = transformPixelToCartesian(0, parseInt(canvas.height), -2, 2, parseInt(zoomInput.value), parseFloat(yInput.value));
     yInput.value = y;
 
     sendGenerateRequest();
@@ -120,8 +120,8 @@ function sendGenerateRequest() {
         pointY: parseFloat(yInput.value),
         zoom: parseInt(zoomInput.value),
         maxIters: parseInt(iterInput.value),
-        resolutionWidth: 500,
-        resolutionHeight: 500
+        resolutionWidth: parseInt(canvas.width),
+        resolutionHeight: parseInt(canvas.height)
     };
     ws.send(JSON.stringify(message));
     console.log("Sent message");
@@ -137,7 +137,7 @@ ws.onmessage = (event) => {
         img.onload = () => {
             console.log("Image loaded");
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img, 0, 0, 500, 500);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         };
         img.src = url;
     } else {
