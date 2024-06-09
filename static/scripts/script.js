@@ -16,6 +16,9 @@ const xInput = document.getElementById("inputX");
 const yInput = document.getElementById("inputY");
 const iterInput = document.getElementById("inputIters");
 
+const decItersButton = document.getElementById("decreaseIters");
+const incItersButton = document.getElementById("increaseIters");
+
 const leftButton = document.getElementById("leftButton");
 const rightButton = document.getElementById("rightButton");
 const downButton = document.getElementById("downButton");
@@ -33,6 +36,15 @@ function clamp(num, min, max) {
     return Math.min(Math.max(num, min), max);
 }
 
+decItersButton.addEventListener("click", () => {
+    iterInput.value = clamp(Math.floor(parseInt(iterInput.value) - (iterInput.value / 4)), 1, Number.POSITIVE_INFINITY);
+    sendGenerateRequest();
+})
+
+incItersButton.addEventListener("click", () => {
+    iterInput.value = clamp(Math.floor(parseInt(iterInput.value) + (iterInput.value / 4)), 1, Number.POSITIVE_INFINITY);
+    sendGenerateRequest();
+})
 // Handle canvas zoom with wheel
 canvas.addEventListener("wheel", event => {
     const rect = canvas.getBoundingClientRect();

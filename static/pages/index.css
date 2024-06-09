@@ -72,7 +72,7 @@ p {
 }
 
 input[type="number"] {
-    width: 100px;
+    width: 200px;
 }
 
 input[type="range"] {
@@ -132,6 +132,31 @@ button:hover {
 #rightButton {
     height: 100%;
     right: -60px;
+}
+
+.iter-control {
+    display: flex;
+    align-items: center;
+}
+
+.iter-button {
+    background-color: #BB86FC;
+    border: none;
+    color: #121212;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.iter-button:hover {
+    background-color: #3700B3;
+}
+
+.iter-control input[type="number"] {
+    width: 60px;
+    text-align: center;
+    margin: 0 10px;
 }
 
 /* Responsive styling */
