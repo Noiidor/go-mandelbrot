@@ -2,11 +2,13 @@ package service
 
 import (
 	"fmt"
+	bigcomplex "go-mandelbrot/pkg/helpers/big-complex"
 	colorhelp "go-mandelbrot/pkg/helpers/color"
 	"go-mandelbrot/pkg/helpers/math"
 	"image"
 	"image/color"
 	"image/draw"
+	"math/big"
 	"math/cmplx"
 	"sync"
 	"time"
@@ -22,7 +24,7 @@ func timer(name string) func() {
 const (
 	itersPerRegion = 20
 
-	defaultRegionsNum = 100
+	defaultRegionsNum = 500
 )
 
 type colorRegion struct {
@@ -52,11 +54,13 @@ func checkRegionsDeficiency(maxIters uint32) {
 }
 
 func transformPixelToCartesian(point, pixelBounds uint32, axisMin, axisMax, offset float64, zoom uint64) float64 {
-	// Scaling
-	axisMin /= float64(zoom)
-	axisMax /= float64(zoom)
+	invZoom := float64(1.0) / float64(zoom)
+	axisMin *= invZoom
+	axisMax *= invZoom
 
-	transformed := axisMin + ((float64(point) / (float64(pixelBounds - 1))) * (axisMax - axisMin))
+	axisRange := axisMax - axisMin
+
+	transformed := axisMin + (float64(point)/float64(pixelBounds-1))*axisRange
 
 	return transformed + offset
 }
@@ -161,6 +165,50 @@ func iteratePoint(x, y float64, maxIters uint32) uint32 {
 		z = z*z + c
 
 		if cmplx.Abs(z) > 2 {
+			return n
+		}
+	}
+
+	return maxIters
+}
+
+// UNUSED
+func transformPixelToCartesianBig(point, pixelBounds uint32, axisMin, axisMax, offset float64, zoom uint64) *big.Float {
+	bigPoint := new(big.Float).SetUint64(uint64(point))
+	bigPixelBounds := new(big.Float).SetUint64(uint64(pixelBounds))
+	bigAxisMin := new(big.Float).SetFloat64(axisMin)
+	bigAxisMax := new(big.Float).SetFloat64(axisMax)
+	bigOffset := new(big.Float).SetFloat64(offset)
+	bigZoom := new(big.Float).SetUint64(zoom)
+
+	bigOne := new(big.Float).SetFloat64(1.0)
+	invZoom := new(big.Float).Quo(bigOne, bigZoom)
+
+	bigAxisMin.Mul(bigAxisMin, invZoom)
+	bigAxisMax.Mul(bigAxisMax, invZoom)
+
+	axisRange := new(big.Float).Sub(bigAxisMax, bigAxisMin)
+
+	bigPixelBounds.Sub(bigPixelBounds, bigOne)
+	pointRatio := new(big.Float).Quo(bigPoint, bigPixelBounds)
+	transformed := new(big.Float).Mul(pointRatio, axisRange)
+	transformed.Add(bigAxisMin, transformed)
+
+	transformed.Add(transformed, bigOffset)
+
+	return transformed
+}
+
+// UNUSED
+func iteratePointBig(x, y *big.Float, maxIters uint32) uint32 {
+	z := bigcomplex.NewBigComplex(new(big.Float).SetFloat64(0), new(big.Float).SetFloat64(0))
+	c := bigcomplex.NewBigComplex(x, y)
+	two := new(big.Float).SetFloat64(2.0)
+
+	for n := uint32(0); n < maxIters; n++ {
+		z = z.Mul(z).Add(c)
+
+		if z.Abs().Cmp(two) > 0 {
 			return n
 		}
 	}

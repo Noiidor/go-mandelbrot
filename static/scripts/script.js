@@ -4,7 +4,7 @@
 const WS_URL = "ws://localhost:5050/v1/mandelbrot";
 const COLORS_URL = "http://localhost:5050/v1/mandelbrot/colors";
 
-const ws = new WebSocket(WS_URL);
+let ws = new WebSocket(WS_URL);
 // ws.binaryType = "arraybuffer";
 
 const canvas = document.getElementById("mandelbrotCanvas");
@@ -107,7 +107,7 @@ ws.onopen = () => {
     document.getElementById("requestImage").addEventListener("click", () => {
         sendGenerateRequest();
         zoomSlider.max = zoomInput.value;
-        zoomSlider.step = zoomInput.value / 10;
+        zoomSlider.step = zoomInput.value / 10; // not working properly
         zoomSlider.value = zoomInput.value;
     });
 
@@ -124,6 +124,8 @@ ws.onopen = () => {
             console.error("Error requesting colors:", error);
         }
     });
+
+    sendGenerateRequest();
 };
 
 function sendGenerateRequest() {
@@ -156,6 +158,7 @@ ws.onmessage = (event) => {
         console.log("Expected binary data");
     }
 };
+
 
 ws.onerror = error => {
     console.error("WebSocket error:", error);
