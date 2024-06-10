@@ -194,6 +194,35 @@ func iteratePointRaw(x0, y0 float64, maxIters uint32) uint32 {
 	return i
 }
 
+// Derivative bailout method
+// Kinda works?..
+// Not sure, may improve
+func iteratePointDbail(x0, y0 float64, maxIters uint32) uint32 {
+
+	x := float64(0)
+	y := float64(0)
+
+	dx_sum := float64(0)
+	dy_sum := float64(0)
+
+	dbail := 1e300
+
+	i := uint32(0)
+	for ; magn(dx_sum, dy_sum) < dbail && i < maxIters; i++ {
+		xtemp := x*x - y*y + x0
+		y = 2*x*y + y0
+		x = xtemp
+
+		dx_sum += (dx_sum*x-dy_sum*y)*2 + 1
+		dy_sum += (dy_sum*x + dx_sum*y) * 2
+	}
+
+	return i
+}
+func magn(a, b float64) float64 {
+	return a*a + b*b
+}
+
 // UNUSED
 func transformPixelToCartesianBig(point, pixelBounds uint32, axisMin, axisMax, offset float64, zoom uint64) *big.Float {
 	bigPoint := new(big.Float).SetUint64(uint64(point))
