@@ -12,6 +12,8 @@ import (
 	"math/cmplx"
 	"sync"
 	"time"
+
+	"github.com/ericlagergren/decimal"
 )
 
 func timer(name string) func() {
@@ -199,11 +201,40 @@ func transformPixelToCartesianBig(point, pixelBounds uint32, axisMin, axisMax, o
 	return transformed
 }
 
+func transformPixelToCartesianDecimal(point, pixelBounds uint32, axisMin, axisMax, offset float64, zoom uint64) *decimal.Big {
+	bigPoint := new(decimal.Big).SetUint64(uint64(point))
+	bigPixelBounds := new(decimal.Big).SetUint64(uint64(pixelBounds))
+	bigAxisMin := new(decimal.Big).SetFloat64(axisMin)
+	bigAxisMax := new(decimal.Big).SetFloat64(axisMax)
+	bigOffset := new(decimal.Big).SetFloat64(offset)
+	bigZoom := new(decimal.Big).SetUint64(zoom)
+
+	bigOne := new(decimal.Big).SetFloat64(1.0)
+	invZoom := new(decimal.Big).Quo(bigOne, bigZoom)
+
+	bigAxisMin.Mul(bigAxisMin, invZoom)
+	bigAxisMax.Mul(bigAxisMax, invZoom)
+
+	bigAxisMin.Mul(bigAxisMin, invZoom)
+	bigAxisMax.Mul(bigAxisMax, invZoom)
+
+	axisRange := new(decimal.Big).Sub(bigAxisMax, bigAxisMin)
+
+	bigPixelBounds.Sub(bigPixelBounds, bigOne)
+	pointRatio := new(decimal.Big).Quo(bigPoint, bigPixelBounds)
+	transformed := new(decimal.Big).Mul(pointRatio, axisRange)
+	transformed.Add(bigAxisMin, transformed)
+
+	transformed.Add(transformed, bigOffset)
+
+	return transformed
+}
+
 // UNUSED
-func iteratePointBig(x, y *big.Float, maxIters uint32) uint32 {
-	z := bigcomplex.NewBigComplex(new(big.Float).SetFloat64(0), new(big.Float).SetFloat64(0))
+func iteratePointDecimal(x, y *decimal.Big, maxIters uint32) uint32 {
+	z := bigcomplex.NewBigComplex(new(decimal.Big).SetFloat64(0), new(decimal.Big).SetFloat64(0))
 	c := bigcomplex.NewBigComplex(x, y)
-	two := new(big.Float).SetFloat64(2.0)
+	two := new(decimal.Big).SetFloat64(2.0)
 
 	for n := uint32(0); n < maxIters; n++ {
 		z = z.Mul(z).Add(c)

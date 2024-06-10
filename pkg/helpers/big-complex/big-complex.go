@@ -1,43 +1,47 @@
 package bigcomplex
 
-import "math/big"
+import (
+	"github.com/ericlagergren/decimal"
+)
 
-// Tried to use arbitrary precision floats for increased zoom
-// Failed miserably(5m for single image at zoom 1.4*10^14)
-
+// BigComplex represents a complex number with decimal.Big components
 type BigComplex struct {
-	real, imag *big.Float
+	real, imag *decimal.Big
 }
 
-func NewBigComplex(real, imag *big.Float) *BigComplex {
+// NewBigComplex creates a new BigComplex
+func NewBigComplex(real, imag *decimal.Big) *BigComplex {
 	return &BigComplex{
 		real: real,
 		imag: imag,
 	}
 }
 
+// Add adds two BigComplex numbers and stores the result in the receiver
 func (z *BigComplex) Add(w *BigComplex) *BigComplex {
 	z.real.Add(z.real, w.real)
 	z.imag.Add(z.imag, w.imag)
 	return z
 }
 
+// Mul multiplies two BigComplex numbers and stores the result in the receiver
 func (z *BigComplex) Mul(w *BigComplex) *BigComplex {
-	real := new(big.Float).Sub(
-		new(big.Float).Mul(z.real, w.real),
-		new(big.Float).Mul(z.imag, w.imag),
+	real := new(decimal.Big).Sub(
+		new(decimal.Big).Mul(z.real, w.real),
+		new(decimal.Big).Mul(z.imag, w.imag),
 	)
-	imag := new(big.Float).Add(
-		new(big.Float).Mul(z.real, w.imag),
-		new(big.Float).Mul(z.imag, w.real),
+	imag := new(decimal.Big).Add(
+		new(decimal.Big).Mul(z.real, w.imag),
+		new(decimal.Big).Mul(z.imag, w.real),
 	)
 	z.real, z.imag = real, imag
 	return z
 }
 
-func (z *BigComplex) Abs() *big.Float {
-	realSq := new(big.Float).Mul(z.real, z.real)
-	imagSq := new(big.Float).Mul(z.imag, z.imag)
-	sum := new(big.Float).Add(realSq, imagSq)
-	return new(big.Float).Sqrt(sum)
+// Abs returns the absolute value (magnitude) of the BigComplex number
+func (z *BigComplex) Abs() *decimal.Big {
+	realSq := new(decimal.Big).Mul(z.real, z.real)
+	imagSq := new(decimal.Big).Mul(z.imag, z.imag)
+	sum := new(decimal.Big).Add(realSq, imagSq)
+	return sum.Context.Sqrt(sum, sum)
 }
