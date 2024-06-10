@@ -91,7 +91,7 @@ func generateItersMap(pointX, pointY float64, zoom uint64, maxIters uint32, widt
 			wg.Add(1)
 			go func() {
 				defer wg.Done()
-				result[x][y] = iteratePoint(axisX[y], axisY[x], maxIters)
+				result[x][y] = iteratePointRaw(axisX[y], axisY[x], maxIters)
 			}()
 		}
 	}
@@ -159,6 +159,7 @@ func generateImage(itersMap [][]uint32, width, height, maxIter uint32) image.Ima
 	return img
 }
 
+// Not efficient
 func iteratePoint(x, y float64, maxIters uint32) uint32 {
 	var z complex128
 	c := complex(x, y)
@@ -172,6 +173,25 @@ func iteratePoint(x, y float64, maxIters uint32) uint32 {
 	}
 
 	return maxIters
+}
+
+func iteratePointRaw(x0, y0 float64, maxIters uint32) uint32 {
+	x2 := float64(0)
+	y2 := float64(0)
+
+	x := float64(0)
+	y := float64(0)
+
+	i := uint32(0)
+	for ; x2+y2 <= 4 && i < maxIters; i++ {
+		y = (x+x)*y + y0
+		x = x2 - y2 + x0
+
+		x2 = x * x
+		y2 = y * y
+	}
+
+	return i
 }
 
 // UNUSED
