@@ -16,7 +16,7 @@ var upgrader = websocket.Upgrader{}
 func GetMandelbrotImageHandler(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Printf("upgrate conn error: %w", err)
+		log.Printf("upgrate conn error: %s", err)
 		return
 	}
 	defer conn.Close()
@@ -24,14 +24,14 @@ func GetMandelbrotImageHandler(w http.ResponseWriter, r *http.Request) {
 	for {
 		_, mes, err := conn.ReadMessage()
 		if err != nil {
-			log.Printf("read message error: %w", err)
+			log.Printf("read message error: %s", err)
 			return
 		}
 
 		var wsParams messages.WsParams
 		err = json.Unmarshal(mes, &wsParams)
 		if err != nil {
-			log.Printf("unmarshal error: %w", err)
+			log.Printf("unmarshal error: %s", err)
 			return
 		}
 
@@ -39,7 +39,7 @@ func GetMandelbrotImageHandler(w http.ResponseWriter, r *http.Request) {
 
 		wc, err := conn.NextWriter(websocket.BinaryMessage)
 		if err != nil {
-			log.Printf("get next writer error: %w", err)
+			log.Printf("get next writer error: %s", err)
 			return
 		}
 		err = png.Encode(wc, img)
