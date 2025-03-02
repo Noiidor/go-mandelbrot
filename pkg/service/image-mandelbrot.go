@@ -4,16 +4,19 @@ import (
 	"fmt"
 	bigcomplex "go-mandelbrot/pkg/helpers/big-complex"
 	colorhelp "go-mandelbrot/pkg/helpers/color"
-	"go-mandelbrot/pkg/helpers/math"
+	mathhelp "go-mandelbrot/pkg/helpers/math"
 	"image"
 	"image/color"
 	"image/draw"
+	"math"
 	"math/big"
 	"math/cmplx"
 	"sync"
 	"time"
 
 	"github.com/ericlagergren/decimal"
+	"github.com/spakin/hsvimage"
+	"github.com/spakin/hsvimage/hsvcolor"
 )
 
 func timer(name string) func() {
@@ -43,7 +46,7 @@ func GenerateMandelbrotImage(pointX, pointY float64, zoom uint64, maxIters uint3
 
 	checkRegionsDeficiency(maxIters)
 
-	img := generateImage(pixelItersMap, width, height, maxIters)
+	img := generateImageHistogram(pixelItersMap, width, height, maxIters)
 
 	return img
 }
@@ -67,7 +70,7 @@ func transformPixelToCartesian(point, pixelBounds uint32, axisMin, axisMax, offs
 	return transformed + offset
 }
 
-func generateItersMap(pointX, pointY float64, zoom uint64, maxIters uint32, width, height uint32) [][]uint32 {
+func generateItersMap(pointX, pointY float64, zoom uint64, maxIters uint32, width, height uint32) [][]float64 {
 	defer timer("generate iters map")()
 
 	axisX := make([]float64, width)
@@ -81,12 +84,12 @@ func generateItersMap(pointX, pointY float64, zoom uint64, maxIters uint32, widt
 		axisY[i] = transformPixelToCartesian(i, height, -2, 2, -pointY, zoom)
 	}
 
-	result := make([][]uint32, width)
+	result := make([][]float64, width)
 
 	var wg sync.WaitGroup
 
 	for x := range result {
-		result[x] = make([]uint32, height)
+		result[x] = make([]float64, height)
 		for y := range result[x] {
 			wg.Add(1)
 			go func() {
@@ -149,10 +152,86 @@ func generateImage(itersMap [][]uint32, width, height, maxIter uint32) image.Ima
 				rightColor = region.nextRegion.startColor
 			}
 
-			ratio := math.RatioBetweenNums(int(boundedIter), int(boundedIter+itersPerRegion), int(iter))
+			ratio := mathhelp.RatioBetweenNums(int(boundedIter), int(boundedIter+itersPerRegion), int(iter))
 			color := colorhelp.LerpColor(leftColor, rightColor, ratio)
 
 			img.Set(y, x, color)
+		}
+	}
+
+	return img
+}
+
+func generateImageHistogram(itersMap [][]float64, width, height, maxIter uint32) image.Image {
+	defer timer("generate image")()
+	img := hsvimage.NewNHSVA(image.Rect(0, 0, int(width), int(height)))
+	draw.Draw(img, img.Bounds(), &image.Uniform{color.White}, image.Point{0, 0}, draw.Src)
+	palette := make([]color.RGBA, maxIter)
+	for i := range maxIter {
+		n := mathhelp.RatioBetweenNums(0, int(maxIter), int(i))
+		palette[i] = colorhelp.LerpColor(
+			color.RGBA{R: 0, G: 0, B: 0, A: 255},
+			color.RGBA{R: 168, G: 13, B: 224, A: 255},
+			n)
+	}
+
+	hist := make([]uint32, maxIter+1)
+	for _, xRow := range itersMap {
+		for _, iter := range xRow {
+			hist[int(math.Floor(iter))]++
+		}
+	}
+
+	total := uint32(0)
+	for _, v := range hist {
+		total += v
+	}
+
+	hues := make([]float64, 0)
+	h := float64(0)
+	for i := range maxIter {
+		h += float64(hist[i]) / float64(total)
+		hues = append(hues, h)
+	}
+	hues = append(hues, h)
+
+	for x, v1 := range itersMap {
+		for y, iter := range v1 {
+			// if uint32(iter) == maxIter {
+			// 	img.Set(y, x, color.Black)
+			// 	continue
+			// }
+			// hue := float64(0)
+			// for i := range uint32(iter) {
+			// 	hue += float64(hist[i]) / float64(total)
+			// }
+
+			// h1 := hues[int(iter)]
+
+			// img.Set(y, x, palette[int(math.Floor(float64(maxIter)*hue))])
+
+			// hue1 := hues[int(iter)]
+			// hue2 := hues[int(iter)+1]
+
+			// iter1 := int(math.Floor(float64(maxIter) * hue1))
+			// iter2 := int(math.Floor(float64(maxIter) * hue2))
+
+			// color1 := palette[iter1]
+			// color2 := palette[iter2]
+
+			// _, fractional := math.Modf(iter)
+			// colorFinal := colorhelp.LerpColor(color1, color2, fractional)
+			test := iter / float64(maxIter)
+			colorFinal := hsvcolor.NHSVA64{H: uint16(65535 * test), S: 25535, V: 65535, A: 65535}
+
+			img.Set(y, x, colorFinal)
+		}
+	}
+
+	step := float64(maxIter) / float64(width)
+	for x := range width {
+		for y := range 20 {
+			img.Set(int(x), int(y), palette[int(math.Floor(step*float64(x)))])
 		}
 	}
 
@@ -175,7 +254,7 @@ func iteratePoint(x, y float64, maxIters uint32) uint32 {
 	return maxIters
 }
 
-func iteratePointRaw(x0, y0 float64, maxIters uint32) uint32 {
+func iteratePointRaw(x0, y0 float64, maxIters uint32) float64 {
 	x2 := float64(0)
 	y2 := float64(0)
 
@@ -190,8 +269,14 @@ func iteratePointRaw(x0, y0 float64, maxIters uint32) uint32 {
 		x2 = x * x
 		y2 = y * y
 	}
+	if i == maxIters {
+		return float64(i)
+	}
+	// log_zn := math.Log(x2+y2) / 2
+	logXY := math.Log(x2 + y2)
+	nu := math.Log(logXY) / math.Log(2)
 
-	return i
+	return float64(i) + 1 - nu
 }
 
 // Derivative bailout method

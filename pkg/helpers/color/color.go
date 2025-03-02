@@ -17,7 +17,7 @@ func RandomRGBAColor() color.RGBA {
 		uint8(rand.IntN(max-min) + min), 255}
 }
 
-func LerpColor(a, b color.RGBA, t float64) color.Color {
+func LerpColor(a, b color.RGBA, t float64) color.RGBA {
 	if t == 0 {
 		return a
 	}
